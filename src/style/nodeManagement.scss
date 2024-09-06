@@ -1,0 +1,78 @@
+.node-management {
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+  
+      h2 {
+        margin: 0;
+      }
+  
+      .create-node-button {
+        background-color: #28a745;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        border-radius: 5px;
+  
+        &:hover {
+          background-color: #218838;
+        }
+      }
+    }
+  
+    .node-card {
+      background-color: white;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      min-height: 120px;
+      padding: 20px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  
+      .node-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+  
+        h3 {
+          margin: 0;
+          font-size: 18px;
+        }
+  
+        .node-card-actions {
+          display: flex;
+          gap: 10px;
+  
+          button {
+            background: none;
+            border: none;
+            color: #007bff;
+            font-size: 14px;
+            cursor: pointer;
+  
+            &:hover {
+              text-decoration: underline;
+            }
+          }
+        }
+      }
+  
+      p {
+        margin: 0 0 10px;
+        font-size: 14px;
+        color: #555;
+  
+        &.in-charge {
+          font-weight: bold;
+          span {
+            color: #28a745;
+          }
+        }
+      }
+    }
+  }
+  

@@ -1,0 +1,89 @@
+.tracking-management {
+    font-family: Arial, sans-serif;
+    height: 90%;
+
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 40px;
+}
+
+.create-tracking {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.create-tracking:hover {
+    background-color: #218838;
+}
+
+.table-container {
+    overflow-x: auto;
+    height: calc(100% - 40px);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+.manage-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.manage-button:hover {
+    background-color: #0056b3;
+}
+
+.action-icon {
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+.pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.prev, .next {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.prev:hover, .next:hover {
+    background-color: #0056b3;
+}
+
+.rows-per-page {
+    padding: 10px;
+    border-radius: 5px;
+}

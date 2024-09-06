@@ -1,0 +1,64 @@
+@import "./rete.scss";
+@import "./tracking.scss";
+@import "./trackingUpsert.scss";
+@import "./nodeManagement.scss";
+@import "./spinner.scss";
+@import "./upsertNode.scss";
+@import "./adjustStock.scss";
+@import "./createProduct.scss";
+@import "./components/index.scss";
+
+.headerStyle {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 16.42px;
+  text-align: left;
+  color: #000000;
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+label {
+  margin: 0;
+  align-self: start;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.example {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.green-button {
+  background-color: green;
+  color: #fff;
+}
+
+.white-button {
+  background-color: #fff;
+  color: #232323;
+  border: 1px solid #232323;
+}
+
+.drawer-container {
+  // background-color: white;
+  min-width: 270px;
+  max-width: 270px;
+  margin-top: 30px;
+}
+.content-container {
+  width: calc(100% - 270px);
+  padding: 0 3.5rem;
+}
+
+.active {
+  background-color: var(--primary);
+  color: white;
+}
+
+.product-details{
+  height: calc(100% - 60px);
+  overflow-y: auto;
+}
