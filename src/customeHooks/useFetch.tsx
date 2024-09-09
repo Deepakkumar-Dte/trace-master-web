@@ -1,4 +1,4 @@
-import { Dispatch, useEffect, useState } from "react";
+import { Dispatch, useEffect, useState, useCallback } from "react";
 
 type returnType = [
   loading: boolean,
@@ -9,7 +9,9 @@ type returnType = [
 ];
 
 type apiType = {
-  [key: string]: (...arg: any[]) => Promise<{ data: any; message: string; success: boolean }>;
+  [key: string]: (
+    ...arg: any[]
+  ) => Promise<{ data: any; message: string; success: boolean }>;
 };
 type payload = {
   [key: string]: any[];
@@ -21,11 +23,7 @@ const useFetch: UseFetch = (apiList, payloadData) => {
   const [data, setData] = useState<any>({});
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    fetch();
-  }, []);
-
-  const fetch = async () => {
+  const fetch = useCallback(async () => {
     try {
       setLoading(true);
       const result: Record<string, any> = {};
@@ -34,7 +32,7 @@ const useFetch: UseFetch = (apiList, payloadData) => {
         try {
           const api = apiList[key];
           result[key] = (await api(...payload)).data;
-          console.log(result[key],"result")
+          console.log(result[key], "result");
         } catch (error) {
           console.error(error);
           result[key] = null;
@@ -46,7 +44,12 @@ const useFetch: UseFetch = (apiList, payloadData) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetch();
+  }, [fetch]);
+
   return [loading, data, error, setData, fetch];
 };
 

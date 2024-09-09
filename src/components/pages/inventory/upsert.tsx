@@ -1,15 +1,12 @@
+"use client";
 import { useContext, useEffect, useRef, useState } from "react";
 import {
-  createCategory,
-  createSubCategory,
   getLookupList,
   getProductDetails,
-  getSubCategory,
   upsertLookup,
   upsertProduct,
 } from "@/shared/api";
 import { MdArrowBackIosNew } from "react-icons/md";
-import { convertStrArrToOptions } from "@/shared/utils";
 import { Category, SubCategory } from "./category";
 import {
   Button,
@@ -24,19 +21,8 @@ import DropDown from "@/components/ui/dropdown";
 import { useParams, useRouter } from "next/navigation";
 import { ComponentTitleBar } from "@/components/custom";
 import { FiPlus } from "react-icons/fi";
-import { productSchema } from "@/shared/validation_schema/product";
 import { GlobalContext } from "@/context/globalContext";
-import { SingleValue } from "react-select";
 import { useToast } from "@/components/ui/use-toast";
-
-// interface formData {
-//   name: string,
-//   sku: string,
-//   category:string,
-//   subCategory?:string
-//   baseU
-
-// }
 
 const CreateProductForm = () => {
   const { toast } = useToast();
@@ -59,11 +45,7 @@ const CreateProductForm = () => {
     try {
       setisLoading(true);
       const { data } = await getProductDetails(productId);
-      const { value } = categoryList.find((e) => e.label === data.category) ?? {
-        value: null,
-      };
-      console.log(value,data)
-      setFormData({ ...data, categoryId: value });
+      setFormData(data);
     } catch (err) {
       console.log(err);
     } finally {
@@ -72,16 +54,14 @@ const CreateProductForm = () => {
   };
 
   useEffect(() => {
-    console.log(formData.categoryId)
-    if (formData.categoryId) {
-      fetchSubCategory(formData.categoryId);
+    if (formData.category) {
+      fetchSubCategory(formData.category);
     } else {
       setsubCategory([]);
-      // setFormData((prev: any) => ({
-      //   ...prev,
-      //   // subCategory: "",
-      //   // subCategoryId: null,
-      // }));
+      setFormData((prev: any) => ({
+        ...prev,
+        // subCategory: "",
+      }));
     }
   }, [formData.category]);
 
@@ -99,7 +79,13 @@ const CreateProductForm = () => {
 
   const handleCreate = async () => {
     try {
-      const { categoryId, subCategoryId, ...rest } = formData;
+      const {
+        baseUnitLabel,
+        secondaryUnitLabel,
+        categoryLabel,
+        subCategoryLabel,
+        ...rest
+      } = formData;
       const payload = {
         ...rest,
         createdBy: "b64f413b-c0c6-4b79-b918-68fef0679649",
@@ -122,7 +108,6 @@ const CreateProductForm = () => {
         lookupId: categoryId,
         forLookupValue: true,
       });
-      console.log(data);
       setsubCategory(data);
     } catch (err) {
       console.log(err);
@@ -263,14 +248,13 @@ const CreateProductForm = () => {
                 onChange={(e: any) =>
                   setFormData((pre: any) => ({
                     ...pre,
-                    category: e.label,
-                    categoryId: e.value,
+                    category: e.value,
                   }))
                 }
-                value={categoryList.find((e) => e.label === formData.category)}
+                value={categoryList.find((e) => e.value === formData.category)}
               />
               <DropDown
-                isDisabled={!formData.categoryId}
+                isDisabled={!formData.category}
                 styles={{
                   option: (base) => {
                     (base.border = "1px solid #CCCCCC"), (base.margin = 0);
@@ -286,12 +270,11 @@ const CreateProductForm = () => {
                 onChange={(e: any) =>
                   setFormData((pre: any) => ({
                     ...pre,
-                    subCategory: e ? e.label : null,
-                    subCategoryId: e ? e.value : null,
+                    subCategory: e ? e.value : null,
                   }))
                 }
                 value={subCategory.find(
-                  (e) => e.label === formData.subCategory
+                  (e) => e.value === formData.subCategory
                 )}
                 extra={[
                   {
@@ -331,9 +314,13 @@ const CreateProductForm = () => {
                 options={unitList}
                 name="baseUnit"
                 onChange={(e: any) =>
-                  setFormData((pre: any) => ({ ...pre, baseUnit: e.label }))
+                  setFormData((pre: any) => ({
+                    ...pre,
+                    baseUnit: e.value,
+                    baseUnitLabel: e.label,
+                  }))
                 }
-                value={unitList.find((e) => e.label === formData.baseUnit)}
+                value={unitList.find((e) => e.value === formData.baseUnit)}
               />
 
               <DropDown
@@ -351,15 +338,16 @@ const CreateProductForm = () => {
                 onChange={(e: any) =>
                   setFormData((pre: any) => ({
                     ...pre,
-                    secondaryUnit: e.label,
+                    secondaryUnit: e.value,
+                    secondaryUnitLabel: e.label,
                   }))
                 }
-                value={unitList.find((e) => e.label === formData.secondaryUnit)}
+                value={unitList.find((e) => e.value === formData.secondaryUnit)}
               />
             </div>
             {formData?.secondaryUnit && formData?.baseUnit ? (
               <div className="p-3 mx-3 ">
-                1 {formData?.baseUnit} ={" "}
+                1 {formData?.baseUnitLabel} ={" "}
                 <input
                   style={{ border: "1px solid #CCCCCC" }}
                   className="w-10 rounded"
@@ -367,7 +355,7 @@ const CreateProductForm = () => {
                   onChange={handleChange}
                   value={formData?.convertionRate}
                 />
-                {formData?.secondaryUnit}
+                {formData?.secondaryUnitLabel}
               </div>
             ) : null}
             <div className="mb-4 px-3">

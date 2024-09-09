@@ -1,1 +1,1 @@
-export * from "./compoentTypes";
+export * from "./node";

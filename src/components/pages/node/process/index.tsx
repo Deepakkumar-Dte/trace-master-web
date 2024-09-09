@@ -1,13 +1,13 @@
 import { FC, useContext } from "react";
-import IoFrom from "@/custom-components/node/IOform";
-import { ProcessContext } from "@/context/processContext";
+import { Ioform } from "@/components/custom";
+import { NodeProcessContext } from "@/context/processContext";
 import { Button, Input } from "@/components/ui";
 
 const Process: FC<{ nodeId: string; index: number }> = ({
   index: processIndex,
 }) => {
   const { processes, addIOForm, removeIOForm, handleChange } =
-    useContext(ProcessContext);
+    useContext(NodeProcessContext);
 
   return (
     <>
@@ -36,7 +36,7 @@ const Process: FC<{ nodeId: string; index: number }> = ({
           {processes[processIndex].outputs.map(
             (output: any, ioIndex: number) => {
               return (
-                <IoFrom
+                <Ioform
                   key={`${processIndex}:${ioIndex}`}
                   handleBlur={() => {}}
                   data={output}
@@ -71,49 +71,48 @@ const Process: FC<{ nodeId: string; index: number }> = ({
           Add Field
         </Button>
       </div>
-      <div className="form-group mx-4">
-        <div
-          className=" p-4 mt-5 flex flex-col gap-5"
-          style={{
-            border: "1px solid #CCCCCC",
-          }}
-        >
-          <div className="font-[700] text-[16px] mb-3">Input Form*</div>
-          {processes[processIndex].inputs.map((input: any, ioIndex: number) => {
-            return (
-              <IoFrom
-                handleBlur={() => {}}
-                data={input}
-                handleChange={(name, value) =>
-                  handleChange({
-                    name,
-                    value,
-                    processIndex,
-                    ioIndex,
-                    type: "inputs",
-                  })
-                }
-                handleRemove={() => {
-                  removeIOForm("inputs", processIndex, ioIndex);
-                }}
-                id={input.formId}
-                index={ioIndex}
-              />
-            );
-          })}
-        </div>
-        <Button
-          style={{
-            padding: " 0.5rem 1rem",
-            margin: "1rem 0",
-          }}
-          onClick={() => {
-            addIOForm("inputs", processIndex);
-          }}
-        >
-          Add Field
-        </Button>
+      <div
+        className=" p-4 mt-5 flex flex-col gap-5 overflow-x-scroll w-auto"
+        style={{
+          border: "1px solid #CCCCCC",
+        }}
+      >
+        <div className="font-[700] text-[16px] mb-3">Input Form*</div>
+        {processes[processIndex].inputs.map((input: any, ioIndex: number) => {
+          return (
+            <Ioform
+              key={`${processIndex}:${ioIndex}`}
+              handleBlur={() => {}}
+              data={input}
+              handleChange={(name, value) =>
+                handleChange({
+                  name,
+                  value,
+                  processIndex,
+                  ioIndex,
+                  type: "inputs",
+                })
+              }
+              handleRemove={() => {
+                removeIOForm("inputs", processIndex, ioIndex);
+              }}
+              id={input.formId}
+              index={ioIndex}
+            />
+          );
+        })}
       </div>
+      <Button
+        style={{
+          padding: " 0.5rem 1rem",
+          margin: "1rem 0",
+        }}
+        onClick={() => {
+          addIOForm("inputs", processIndex);
+        }}
+      >
+        Add Field
+      </Button>
       <div className="form-group">
         <label>Process Script*</label>
         <div className="script-wrapper">

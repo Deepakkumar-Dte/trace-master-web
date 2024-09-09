@@ -1,5 +1,5 @@
+'use client'
 import { ChangeEventHandler, useEffect, useState } from "react";
-
 import {
   getTrackingOptions,
   getNodeOptions,

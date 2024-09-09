@@ -1,3 +1,4 @@
+'use client'
 import { useFetch } from "@/customeHooks";
 import { getInventoryTracking } from "@/shared/api";
 import { useEffect, useMemo, useState } from "react";

@@ -1,3 +1,4 @@
+'use client'
 import { Button, DataTable, Spinner, Tabs } from "@/components/ui";
 import DropDown from "@/components/ui/dropdown";
 import { useFetch } from "@/customeHooks";
@@ -6,7 +7,7 @@ import { DateTime } from "luxon";
 import { useParams, useRouter } from "next/navigation";
 import { Suspense } from "react";
 
-const History = () => {
+export const History = () => {
   const { productId } = useParams();
   const [loading, data] = useFetch(
     { history: getHistory },

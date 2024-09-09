@@ -1,32 +1,13 @@
-import {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-import { getNodeData, upsertDefaultNode } from "@/shared/api";
-import { NodeType } from "@/shared/type";
-import * as Yup from "yup";
-import { useFormik } from "formik";
-
+'use client'
+import { useContext, useEffect, useMemo } from "react";
+import { getNodeData } from "@/shared/api";
 import Process from "./process";
-import { ProcessContext } from "@/context/processContext";
+import { NodeProcessContext } from "@/context/processContext";
 import { useParams, useRouter } from "next/navigation";
 import { Button, Input, Tabs } from "@/components/ui";
 import { BiLeftArrow } from "react-icons/bi";
 import { ComponentTitleBar } from "@/components/custom";
 import { useFetch } from "@/customeHooks";
-
-type defaultFormObject = {
-  label: string;
-  variableName: string;
-  dataType: string;
-  required: boolean;
-  formId: null | string;
-  type: "input" | "output";
-};
 
 const Upsert = () => {
   const {
@@ -38,7 +19,7 @@ const Upsert = () => {
     formData,
     errors,
     setData,
-  } = useContext(ProcessContext);
+  } = useContext(NodeProcessContext);
 
   const navigate = useRouter();
   const { processId, nodeId } = useParams();

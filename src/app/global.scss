@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
 #root {
   height: 100vh;
   width: 100vw;
@@ -101,6 +100,7 @@
 .content-container {
   width: calc(100% - 270px);
   margin-top: 30px;
+  margin-bottom: 30px;
 }
 
 @import "../style/index.scss";

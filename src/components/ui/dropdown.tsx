@@ -1,3 +1,4 @@
+'use client'
 import React, { HTMLAttributes, ReactNode, useState } from "react";
 import Select, { Props as SelectProps, MultiValue } from "react-select";
 import { Label } from "./label";

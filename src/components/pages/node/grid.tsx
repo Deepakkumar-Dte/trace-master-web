@@ -1,3 +1,4 @@
+'use client'
 import { ComponentTitleBar } from "@/components/custom";
 import { Button, Spinner } from "@/components/ui";
 import { useFetch } from "@/customeHooks";

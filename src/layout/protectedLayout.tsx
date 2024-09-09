@@ -1,7 +1,11 @@
-import { useEffect } from "react";
+"use client";
+import dynamic from "next/dynamic";
 import { Header, Drawer } from "../components/custom";
 import ProcessContextProvider from "@/context/processContext";
 import { GlobalContextProvider } from "@/context/globalContext";
+import { ReactFlowProvider } from "@xyflow/react";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
 
 function AdminLayout(props: any) {
   return (
@@ -12,7 +16,6 @@ function AdminLayout(props: any) {
       }}
     >
       <GlobalContextProvider>
-        {" "}
         <Header />
         <div
           className="scroll-smooth overflow-hidden flex h-[calc(100vh - 80px]"
@@ -22,7 +25,11 @@ function AdminLayout(props: any) {
             <Drawer />
           </div>
           <ProcessContextProvider>
-            <div className="content-container"> {props.children}</div>
+            <ReactFlowProvider>
+              <DndProvider backend={HTML5Backend}>
+                <div className="content-container"> {props.children}</div>
+              </DndProvider>
+            </ReactFlowProvider>
           </ProcessContextProvider>
         </div>
       </GlobalContextProvider>

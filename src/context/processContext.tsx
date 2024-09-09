@@ -62,9 +62,9 @@ const initProcessValues = {
   handleSubmit: () => {},
 };
 
-export const ProcessContext = createContext(initProcessValues);
+export const NodeProcessContext = createContext(initProcessValues);
 
-export default ({ children }: any) => {
+const NodeProcessContextProvider = ({ children }: any) => {
   const [processes, setProcesses] = useState(initProcessValues.processes);
   const [formData, setformData] = useState(initProcessValues.formData);
   const [errors, seterrors] = useState({});
@@ -190,7 +190,7 @@ export default ({ children }: any) => {
     validationSchema: schema,
   });
   return (
-    <ProcessContext.Provider
+    <NodeProcessContext.Provider
       value={{
         processes,
         formData,
@@ -205,6 +205,8 @@ export default ({ children }: any) => {
       }}
     >
       {children}
-    </ProcessContext.Provider>
+    </NodeProcessContext.Provider>
   );
 };
+
+export default NodeProcessContextProvider;

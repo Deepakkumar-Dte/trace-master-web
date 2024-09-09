@@ -1,3 +1,4 @@
+'use client'
 import dashboardImage from "@/assets/dashboard.png";
 import Image from "next/image";
 const Dashboard = () => {

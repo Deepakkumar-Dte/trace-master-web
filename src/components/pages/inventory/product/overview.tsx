@@ -1,5 +1,6 @@
+'use client'
 import { Button, Tabs } from "@/components/ui";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense } from "react";
 import { Spinner } from "@/components/ui";
 import { useParams, useRouter } from "next/navigation";
 import { useFetch } from "@/customeHooks";
@@ -25,63 +26,6 @@ const Overview = () => {
       navigateTo: "history",
     },
   ];
-
-  const Component = () => {
-    const api = {
-      productData: getProductDetails,
-    };
-    const payload = {
-      productData: [productId],
-    };
-    const [loading, { productData: data }] = useFetch(api, payload);
-
-    if (loading) return <Spinner />;
-    return (
-      <div className="grid grid-cols-3 gap-4 mt-4">
-        <div className="col-span-2">
-          <div className="grid grid-cols-2 gap-10">
-            <div className="field flex justify-between">
-              <strong>Product Name:</strong>{" "}
-              <div className="pr-10 font-medium text-[16px]">{data.name}</div>
-            </div>
-            <div className="field flex justify-between">
-              <strong>SKU:</strong>{" "}
-              <div className="pr-10 font-medium text-[16px]">{data.sku}</div>
-            </div>
-            <div className="field flex justify-between">
-              <strong>Category:</strong>{" "}
-              <div className="pr-10 font-medium text-[16px]">{data.category}</div>
-            </div>
-            <div className="field flex justify-between">
-              <strong>Sub Category:</strong>{" "}
-              <div className="pr-10 font-medium text-[16px]">{data.subCategory}</div>
-            </div>
-            <div className="field flex justify-between">
-              <strong>Unit:</strong>{" "}
-              <div className="pr-10 font-medium text-[16px]">
-                {data.secondryUnit
-                  ? `1 ${data.baseUnit} = ${data.convertionRate || 0} ${
-                      data.secondryUnit
-                    }`
-                  : data.baseUnit}
-              </div>
-            </div>
-            <div className="field flex  col-span-2">
-              <strong>Description:</strong>
-              <p className="px-5">{data.description}</p>
-            </div>
-          </div>
-        </div>
-        <div className="col-span-1">
-          <img
-            src="https://via.placeholder.com/150"
-            alt="Tobacco"
-            className="rounded-md shadow-md"
-          />
-        </div>
-      </div>
-    );
-  };
 
   return (
     <Suspense fallback={<Spinner />}>
@@ -119,6 +63,69 @@ const Overview = () => {
         </div>
       </div>
     </Suspense>
+  );
+};
+
+export const Component = () => {
+  const navigate = useRouter();
+  const { productId } = useParams();
+  const api = {
+    productData: getProductDetails,
+  };
+  const payload = {
+    productData: [productId],
+  };
+  const [loading, { productData: data }] = useFetch(api, payload);
+  console.log(data);
+  if (loading) return <Spinner />;
+  return (
+    <div className="grid grid-cols-3 gap-4 mt-4">
+      <div className="col-span-2">
+        <div className="grid grid-cols-2 gap-10">
+          <div className="field flex justify-between">
+            <strong>Product Name:</strong>{" "}
+            <div className="pr-10 font-medium text-[16px]">{data.name}</div>
+          </div>
+          <div className="field flex justify-between">
+            <strong>SKU:</strong>{" "}
+            <div className="pr-10 font-medium text-[16px]">{data.sku}</div>
+          </div>
+          <div className="field flex justify-between">
+            <strong>Category:</strong>{" "}
+            <div className="pr-10 font-medium text-[16px]">
+              {data.categoryLabel}
+            </div>
+          </div>
+          <div className="field flex justify-between">
+            <strong>Sub Category:</strong>{" "}
+            <div className="pr-10 font-medium text-[16px]">
+              {data.subCategoryLabel ?? "-"}
+            </div>
+          </div>
+          <div className="field flex justify-between">
+            <strong>Unit:</strong>{" "}
+            <div className="pr-10 font-medium text-[16px]">
+              {data.secondryUnit
+                ? `1 ${data.baseUnitLabel} = ${data.convertionRate || 0} ${
+                    data.secondryUnitLabel
+                  }`
+                : data.baseUnitLabel}
+            </div>
+          </div>
+          <div className="field flex  col-span-2">
+            <strong>Description:</strong>
+            <p className="px-5">{data.description}</p>
+          </div>
+        </div>
+      </div>
+      <div className="col-span-1">
+        <img
+          src="https://via.placeholder.com/150"
+          alt="Tobacco"
+          className="rounded-md shadow-md"
+        />
+      </div>
+    </div>
   );
 };
 

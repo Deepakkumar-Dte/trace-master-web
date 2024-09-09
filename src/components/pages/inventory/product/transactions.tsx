@@ -1,3 +1,4 @@
+'use client'
 import { DateTime } from "luxon";
 import { Suspense } from "react";
 import { useFetch } from "@/customeHooks";
@@ -6,21 +7,10 @@ import { useParams, useRouter } from "next/navigation";
 import { Button, DataTable, Spinner, Tabs } from "@/components/ui";
 import DropDown from "@/components/ui/dropdown";
 
-const Transactions = () => {
+export const Transactions = () => {
   const api = { transactionData: getTransactions };
   const { productId } = useParams();
   const [isLoading, data] = useFetch(api, { transactionData: [{ productId }] });
-  // const tableData = data.map((e: any) => {
-  //   return {
-  //     Date: DateTime.fromISO(e.createdAt).toFormat("yyyy - MMM - dd"),
-  //     "Node Name": e.nodeTitle || "-",
-  //     "Tracking Name": e.trackingTitle || "-",
-  //     Reason: e.reason || "-",
-  //     Adjustment: e.adjustedQuantity || "-",
-  //     "Current In Stock": e.quantity || "-",
-  //     "Modified By": e.modifiedBy,
-  //   };
-  // });
   if (isLoading) return <Spinner />;
   return (
     <div className="h-full">

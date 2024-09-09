@@ -64,17 +64,8 @@ export const getCategory = async () => await Request.get("/lookup/category");
 
 export const getUnits = async () => await Request.get("/lookup/units");
 
-export const getSubCategory = async (category: string) =>
-  await Request.get("/lookup/subcategory", { params: { category } });
-
-export const createCategory = async (payload: any) =>
-  await Request.post("/lookup/category", payload);
-
 export const createUnit = async (payload: any) =>
   await Request.put("/lookup/units", payload);
-
-export const createSubCategory = async (payload: any) =>
-  await Request.post("/lookup/subcategory", payload);
 
 export const upsertProduct = async (payload: any) =>
   await Request.put("/inventory/upsert", payload);

@@ -1,3 +1,4 @@
+'use client'
 import { useState, ReactNode, FC, memo, useEffect } from "react";
 import { IoMdCloseCircleOutline } from "react-icons/io";
 
@@ -28,6 +29,7 @@ const Tabs = ({ tabs, active, onClick, Suffix, onRemove }: TabProps) => {
         <div>
           {tabs.map((tab: any, index) => (
             <button
+              key={tab.label}
               className={`px-4 py-2 mr-2 relative ${
                 activeTab === index ? "active" : "tab-button"
               }`}

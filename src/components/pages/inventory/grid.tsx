@@ -1,8 +1,4 @@
-// import { useNavigate, useLoaderData } from "react-router-dom";
-// import DynamicTable from "../../custom-components/DynamicTable";
-// import HeaderText from "../../custom-components/headerText";
-// import SearchBar from "../../custom-components/inputComponents/searchBar";
-// import CustomButton from "../../custom-components/buttons/CustomButton";
+'use client'
 import { useRouter, useParams, usePathname } from "next/navigation";
 import { Button, DataTable, Spinner } from "@/components/ui";
 import { ComponentTitleBar } from "@/components/custom";

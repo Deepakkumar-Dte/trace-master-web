@@ -1,2 +1,2 @@
-'use client'
-export { ProductTransaction as default } from "@/components/pages/inventory"
+"use client";
+export { default } from "@/components/pages/inventory/product/index";
