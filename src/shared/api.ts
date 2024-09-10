@@ -38,7 +38,7 @@ const responseHandler = (
 export const getTrackingData = async (id: string) =>
   await Request.get(`/process/${id}`);
 
-export const getTrackingNodes = async (params: any) =>
+export const getProcessMappingNodes = async (params: any) =>
   await Request.get("/node/mapping-nodes", { params });
 
 export const getUserList = async () => await Request.get("/user");
@@ -56,9 +56,6 @@ export const getNodeList = async (params: any) =>
 
 export const getNodeData = async (id: string) =>
   await Request.get(`/node/${id}`);
-
-export const upsertDefaultNode = async (payload: any) =>
-  await Request.put("/node/upsert/default", payload);
 
 export const getCategory = async () => await Request.get("/lookup/category");
 
@@ -105,3 +102,10 @@ export const upsertLookup = async (body: any) =>
 
 export const getTrackingOptions = async () =>
   await Request.get("/process/getOptions");
+
+// node
+export const upsertProcessMappingData = async (body: any) =>
+  await Request.put("/node/upsert/mapping",body);
+
+export const upsertDefaultNode = async (payload: any) =>
+  await Request.put("/node/upsert/default", payload);

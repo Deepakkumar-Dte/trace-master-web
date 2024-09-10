@@ -1,8 +1,8 @@
-'use client'
+"use client";
 import React from "react";
 import { useDrag } from "react-dnd";
 
-const DraggableNode = ({ id, type, name, data }: any) => {
+const DraggableNode = ({ id, data }: { id: string; data: any }) => {
   const [{ isDragging }, drag] = useDrag(() => ({
     type: "NODE",
     item: { id, type: "default", data },
@@ -21,11 +21,11 @@ const DraggableNode = ({ id, type, name, data }: any) => {
         backgroundColor: "lightgray",
         border: "1px solid gray",
         borderRadius: "4px",
-        width: "100px",
-        height: "50px",
+        width: "150px",
+        height: "100%",
       }}
     >
-      {name}
+      {data.name}
     </div>
   );
 };

@@ -1,72 +1,108 @@
-'use client'
-import React, { useCallback, useContext } from "react";
+"use client";
+import "@xyflow/react/dist/style.css";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import {
   ReactFlow,
   useNodesState,
   useEdgesState,
   addEdge,
   useReactFlow,
-  Node as NodeType,
+  Background,
+  BackgroundVariant,
+  Node,
+  Edge,
+  Connection,
 } from "@xyflow/react";
 import { v4 } from "uuid";
-
-import "@xyflow/react/dist/style.css";
 import { CustomEdge, CustomNode, DraggaleNode } from "@/components/custom";
 import { useDrop } from "react-dnd";
+import { Button, Spinner } from "@/components/ui";
+import {
+  getProcessMappingNodes,
+  upsertProcessMappingData,
+  upsertTracking,
+} from "@/shared/api";
+import { useParams } from "next/navigation";
+import { customNodeProps, node as CustomNodeTypes } from "@/types";
+import { NodeMappingContext } from "@/context/nodeMappingContext";
 
-const initialEdges = [
-  {
-    id: "e1-2",
-    source: "1",
-    target: "2",
-    sourceHandle: "output-2",
-    targetHandle: "input-2",
-    label: "Process 1 to Process 2",
-  },
-];
+const convertNodeDataIntoNodeMap = (data: CustomNodeTypes[]) => {
+  return data.reduce((acc, cur) => {
+    acc.set(cur.id, cur);
+    return acc;
+  }, new Map<string, any>());
+};
 
-const NodeMapping = ()=> {
+const convertNodeDataIntoPayload = (nodes: customNodeProps[]) => {
+  return nodes.map((node) => {
+    const {
+      id,
+      position,
+      data: { defaultId, inchargeId, name, processId },
+    } = node;
+    return { id, defaultId, inchargeId, name, processId, ...position };
+  });
+};
+
+const convertEdgeDataIntoPayload = (edges: Edge[], processId: string) => {
+  return edges.map((edge) => {
+    const { target, source, sourceHandle, targetHandle, id } = edge;
+    return { target, source, sourceHandle, targetHandle, id, processId };
+  });
+};
+
+const convertMappingNodeDataIntoNode = (
+  nodes: CustomNodeTypes[]
+): customNodeProps[] => {
+  return nodes.map((node) => {
+    return {
+      id: node.id,
+      data: node,
+      type: "default",
+      position: { x: node.x ?? 0, y: node.y ?? 0 },
+    };
+  });
+};
+
+const NodeMapping = () => {
+  const { processId } = useParams();
+  const { defaultNodeList, setDefaultNodeList, setUserOptions } =
+    useContext(NodeMappingContext);
+  const [isLoading, setisLoading] = useState(true);
+  const [nodes, setNodes, onNodesChange] = useNodesState<customNodeProps>([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
+  const existingConnections = useRef<string[]>([]);
+  const removedConnections = useRef<string[]>([]);
+
+  const fetchData = useCallback(async () => {
+    try {
+      setisLoading(true);
+      const { data } = await getProcessMappingNodes({ processId });
+      const { defaultNodes, users, edges, mappingNodes } = data;
+      setDefaultNodeList(convertNodeDataIntoNodeMap(defaultNodes));
+      setNodes(convertMappingNodeDataIntoNode(mappingNodes));
+      existingConnections.current = edges.map((e: Edge) => e.id);
+      setEdges(edges);
+      setUserOptions(users);
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setisLoading(false);
+    }
+  }, []);
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
   const handleRemove = (id: any) => {
     setNodes((pre: any) => pre.filter((e: any) => e.id !== id));
   };
-  const initialNodes: (NodeType & {
-    data: { onRemove: (data: any) => void };
-  })[] = [
-    {
-      id: "1",
-      type: "default",
-      position: { x: 0, y: 0 },
-      style: {
-        zIndex: 10,
-      },
-      data: {
-        onRemove: handleRemove,
-        label: "1",
-        processes: [
-          {
-            name: "process1",
-            outputs: [{ label: "ReqId, Name" }, { label: "Name, age" }],
-          },
-        ],
-      },
-    },
-    {
-      id: "2",
-      position: { x: 0, y: 100 },
-      data: {
-        onRemove: handleRemove,
-        label: "2",
-        processes: [
-          {
-            name: "process2",
-            inputs: [{ label: "ReqId, Name" }, { label: "Name, age" }],
-          },
-        ],
-      },
-    },
-  ];
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
   const { addNodes } = useReactFlow();
 
@@ -77,40 +113,98 @@ const NodeMapping = ()=> {
         id: v4(),
         type: "default",
         position: { x: 0, y: 0 },
-        data: { ...item.data, onRemove: handleRemove },
+        data: { ...item.data, defaultId: item.id, onRemove: handleRemove },
       };
       addNodes([newNode]);
     },
   }))[1];
 
   const onConnect = useCallback(
-    (params: any) => {
-      console.log(params);
-      setEdges((eds) => addEdge(params, eds));
+    (params: Connection) => {
+      setEdges((eds) => addEdge({ ...params, id: v4() }, eds));
     },
     [setEdges]
   );
+
+  const handleSave = async () => {
+    try {
+      const nodeData = convertNodeDataIntoPayload(nodes);
+      const edgeData = convertEdgeDataIntoPayload(edges, processId as string);
+
+      upsertProcessMappingData({ nodes: nodeData, edges: edgeData, removedConnections: removedConnections.current });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const removeEdgeOnClick = (edge: Edge) => {
+    const initValue: { removedEdge: Edge | null; filteredEdges: Edge[] } = {
+      removedEdge: null,
+      filteredEdges: [],
+    };
+    const { removedEdge, filteredEdges } = edges.reduce((acc, cur) => {
+      if (edge.id === cur.id) {
+        acc.removedEdge = cur;
+      } else {
+        acc.filteredEdges.push(cur);
+      }
+      return acc;
+    }, initValue);
+    if (removedEdge && existingConnections.current.includes(removedEdge.id))
+      removedConnections.current.push(removedEdge.id);
+
+    setEdges(filteredEdges);
+  };
+
   return (
-    <div className="h-full w-full bg-white mb-5">
-      <ReactFlow
-        nodes={nodes}
-        edges={[]}
-        edgeTypes={{ default: CustomEdge }}
-        onEdgeClick={(e, edge) => {
-          setEdges((prev) => prev.filter((e) => e.id !== edge.id));
-        }}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onConnect={onConnect}
-        nodeTypes={{ default: CustomNode as any }}
-      />
-      <div className="flex gap-3 overflow-x-scroll">
-        {/* {data.map((e) => {
-          return <DraggableNode id={e.id} name={e.name} data={e} />;
-        })} */}
-      </div>
+    <div className="h-full w-full mb-5" ref={drop as any}>
+      {!isLoading ? (
+        <>
+          <div className="h-[60px] flex justify-between p-2">
+            <div>
+              <Button>Back</Button>
+            </div>
+            <div className="flex gap-4">
+              <Button>Manage</Button>
+              <Button onClick={handleSave}>Save</Button>
+            </div>
+          </div>
+          <ReactFlow
+            onError={(data, msg) => {
+              console.log(data, msg);
+            }}
+            nodes={nodes}
+            edges={edges}
+            edgeTypes={{ default: CustomEdge }}
+            onEdgeClick={(e, edge) => {
+              removeEdgeOnClick(edge);
+            }}
+            onNodesChange={onNodesChange}
+            onEdgesChange={onEdgesChange}
+            onConnect={onConnect}
+            nodeTypes={{ default: CustomNode as any }}
+            defaultViewport={{ zoom: 1, x: 100, y: 100 }}
+          >
+            <Background
+              color="#ccc"
+              variant={BackgroundVariant.Dots}
+              style={{ backgroundColor: "white" }}
+            />
+          </ReactFlow>
+          <div className="absolute bottom-0 h-[100px] flex p-2 gap-2">
+            {Array.from(
+              defaultNodeList.values(),
+              ({ id, processes, ...rest }) => (
+                <DraggaleNode data={rest} id={id} key={id} />
+              )
+            )}
+          </div>
+        </>
+      ) : (
+        <Spinner />
+      )}
     </div>
   );
-}
+};
 
-export default NodeMapping
+export default NodeMapping;

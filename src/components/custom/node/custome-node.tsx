@@ -1,8 +1,10 @@
-'use client'
+"use client";
 import { Handle, HandleProps, Position } from "@xyflow/react";
 import type { customNodeProps, IOFormtype, IoKeyType } from "../../../types";
-import { memo, useMemo, useCallback } from "react";
+import { memo, useMemo, useCallback, useState, useEffect } from "react";
 import { HoverCard, HoverCardTrigger, HoverCardContent } from "@/components/ui";
+import { useContext } from "react";
+import { NodeMappingContext } from "@/context/nodeMappingContext";
 
 const handlerCommonAttributes: Record<IoKeyType, HandleProps> = {
   input: {
@@ -16,9 +18,26 @@ const handlerCommonAttributes: Record<IoKeyType, HandleProps> = {
 };
 
 const CustomNode = ({ data }: customNodeProps) => {
-  const processesLength = useMemo(() => {
-    return data.processes.length ?? 2;
+  const { defaultNodeList, userList } = useContext(NodeMappingContext);
+  const defaultNodeData = defaultNodeList.get(data.defaultId as string);
+  const [formData, setFormData] = useState<{
+    name: string;
+    inchargeId: string | null;
+  }>({ name: "", inchargeId: null });
+
+  useEffect(() => {
+    if (defaultNodeData) {
+      setFormData({
+        name: defaultNodeData.name,
+        inchargeId: defaultNodeData.inchargeId,
+      });
+    }
   }, []);
+  if (!defaultNodeData) return;
+
+  const processesLength = useMemo(() => {
+    return defaultNodeData.processes.length ?? 2;
+  }, [defaultNodeData.processes.length]);
 
   const Handler = useCallback(
     (
@@ -49,10 +68,19 @@ const CustomNode = ({ data }: customNodeProps) => {
     []
   );
 
+  const onChange = (name: "name" | "inchargeId", value: string) => {
+    data[name] = value;
+    setFormData((pre) => ({ ...pre, [name]: value }));
+  };
+
   return (
     <div style={{ minHeight: `${processesLength * 200}px` }}>
-      <input style={{ border: 0, width: "100%" }} value={data.name} />
-      {...data.processes.map((process, index) => {
+      <input
+        style={{ border: 0, width: "100%" }}
+        value={formData.name}
+        onChange={(e) => onChange("name", e.target.value)}
+      />
+      {...defaultNodeData.processes.map((process, index) => {
         return [
           Handler(
             process.inputs ?? [],
@@ -66,6 +94,40 @@ const CustomNode = ({ data }: customNodeProps) => {
           ),
         ];
       })}
+      <select
+        value={formData.inchargeId ?? ""}
+        onChange={(e) =>
+          e.target.value && onChange("inchargeId", e.target.value)
+        }
+        style={{
+          position: "absolute",
+          bottom: 5,
+          left: 0,
+          width: "calc(100% - 10px)",
+          margin: "0px 5px",
+        }}
+      >
+        <option key={"default"} value={""}>
+          select incharge
+        </option>
+        {userList.map((e) => {
+          return (
+            <option key={e.value} value={e.value}>
+              {e.label}
+            </option>
+          );
+        })}
+      </select>
+      {/* <DropDown
+      openMenuOnClick={true}
+        onClick={(e) => {
+          e.stopPropagation();
+        }}
+        value={formData.inchargeId ? { label: "user", value: "user" } : null}
+        placeholder="Incharge"
+        options={[{ label: "user", value: "user" }]}
+        onChange={(e: any) => onChange("inchargeId", e.value)}
+      /> */}
     </div>
   );
 };

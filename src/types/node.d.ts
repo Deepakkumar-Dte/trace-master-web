@@ -1,3 +1,5 @@
+import { Node } from "@xyflow/react";
+
 export type IODataType =
   | "auto"
   | "text"
@@ -31,14 +33,14 @@ export type node = {
   processes: processes[];
   defaultId: string | null;
   inchargeId: string | null;
+  processId: string;
   x?: number;
   y?: number;
 };
 
-export interface customNodeProps {
-  id: string;
+export type customNodeProps = Node & {
   data: node;
-  onRemove: (nodeId: string) => void;
-}
+  onRemove?: (nodeId: string) => void;
+};
 
 export type IoKeyType = "input" | "output";

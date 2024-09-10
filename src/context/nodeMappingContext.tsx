@@ -1,23 +1,52 @@
-
 import { node } from "@/types";
-import { createContext, PropsWithChildren } from "react";
+import {
+  createContext,
+  Dispatch,
+  PropsWithChildren,
+  SetStateAction,
+  useState,
+} from "react";
+
+interface userListType {
+  name: string;
+  email: string;
+  id: string;
+}
 
 type NodeMappingData = {
-  defaultNodes: Map<string, Exclude<node, "processes">>;
-  mappingNodes: node[];
+  defaultNodeList: Map<string, node>;
+  setDefaultNodeList: Dispatch<
+    SetStateAction<NodeMappingData["defaultNodeList"]>
+  >;
+  userList: { label: string; value: string }[];
+  setUserOptions: (arg: userListType[]) => void;
 };
 
 const NodeMappingContextInitialValue: NodeMappingData = {
-  defaultNodes: new Map(),
-  mappingNodes: [],
+  defaultNodeList: new Map(),
+  userList: [],
+  setDefaultNodeList: () => {},
+  setUserOptions: (arg: userListType[]) => {},
 };
 
 export const NodeMappingContext = createContext(NodeMappingContextInitialValue);
 
-const NodeMappingContextProvider = ({ children }: PropsWithChildren) => (
-  <NodeMappingContext.Provider value={NodeMappingContextInitialValue}>
-    {children}
-  </NodeMappingContext.Provider>
-);
+const NodeMappingContextProvider = ({ children }: PropsWithChildren) => {
+  const [defaultNodeList, setDefaultNodeList] = useState<Map<string, node>>(
+    new Map()
+  );
+  const [userList, setuserList] = useState<NodeMappingData["userList"]>([]);
+
+  const setUserOptions = (users: userListType[]) => {
+    setuserList(users.map((e) => ({ label: e.name, value: e.id })));
+  };
+  return (
+    <NodeMappingContext.Provider
+      value={{ defaultNodeList, setDefaultNodeList, userList, setUserOptions }}
+    >
+      {children}
+    </NodeMappingContext.Provider>
+  );
+};
 
 export default NodeMappingContextProvider;
