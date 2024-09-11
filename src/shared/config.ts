@@ -32,4 +32,7 @@ export let dataTypeOptions = [
   { label: "Auto", value: "auto" },
   { label: "Text", value: "text" },
   { label: "Number", value: "number" },
+  { label: "Date", value: "date" },
+  { label: "Dropdown", value: "dropdown" },
+  { label: "Object", value: "object" },
 ];

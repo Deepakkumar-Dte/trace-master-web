@@ -14,7 +14,6 @@ interface ComboBoxProps extends SelectProps<ComboBoxOption> {
   options: ComboBoxOption[];
   label?: string;
   wrapperProps?: HTMLAttributes<HTMLDivElement>;
-  onClick: MouseEventHandler
   extra?: {
     label: ReactNode;
     value: any;

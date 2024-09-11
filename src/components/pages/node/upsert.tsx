@@ -1,13 +1,19 @@
-'use client'
-import { useContext, useEffect, useMemo } from "react";
+"use client";
+import {
+  memo,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { getNodeData } from "@/shared/api";
 import Process from "./process";
 import { NodeProcessContext } from "@/context/processContext";
 import { useParams, useRouter } from "next/navigation";
-import { Button, Input, Tabs } from "@/components/ui";
+import { Button, Input, Spinner, Tabs } from "@/components/ui";
 import { BiLeftArrow } from "react-icons/bi";
 import { ComponentTitleBar } from "@/components/custom";
-import { useFetch } from "@/customeHooks";
 
 const Upsert = () => {
   const {
@@ -17,19 +23,31 @@ const Upsert = () => {
     handleSubmit,
     handleChange,
     formData,
-    errors,
     setData,
   } = useContext(NodeProcessContext);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const fetchNodeData = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const { data } = await getNodeData(nodeId as string);
+      setData(data);
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (nodeId) fetchNodeData();
+    else {
+      setIsLoading(false);
+    }
+  }, []);
 
   const navigate = useRouter();
   const { processId, nodeId } = useParams();
-  const [loading, data] = useFetch(
-    { nodeData: getNodeData },
-    { nodeData: [nodeId] }
-  );
-  useEffect(() => {
-    if (data.nodeData) setData(data.nodeData);
-  }, [data.nodeData]);
 
   const title = useMemo(() => {
     const prefix = processId ? "Process" : "";
@@ -37,7 +55,7 @@ const Upsert = () => {
     return `${prefix} ${title}`;
   }, []);
 
-  if (loading) return <>Loading....</>;
+  if (isLoading) return <Spinner />;
 
   return (
     <div className="h-full flex flex-col gap-y-4 overflow-y-auto">
@@ -46,7 +64,9 @@ const Upsert = () => {
           width: "90px",
           padding: "0.5rem 1rem",
         }}
-        onClick={navigate.back}
+        onClick={() => {
+          navigate.back();
+        }}
       >
         <BiLeftArrow /> &nbsp;Back
       </Button>
@@ -146,4 +166,4 @@ const Upsert = () => {
   );
 };
 
-export default Upsert;
+export default memo(Upsert);

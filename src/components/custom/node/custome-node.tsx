@@ -28,16 +28,11 @@ const CustomNode = ({ data }: customNodeProps) => {
   useEffect(() => {
     if (defaultNodeData) {
       setFormData({
-        name: defaultNodeData.name,
-        inchargeId: defaultNodeData.inchargeId,
+        name: data.name,
+        inchargeId: data.inchargeId,
       });
     }
   }, []);
-  if (!defaultNodeData) return;
-
-  const processesLength = useMemo(() => {
-    return defaultNodeData.processes.length ?? 2;
-  }, [defaultNodeData.processes.length]);
 
   const Handler = useCallback(
     (
@@ -73,8 +68,13 @@ const CustomNode = ({ data }: customNodeProps) => {
     setFormData((pre) => ({ ...pre, [name]: value }));
   };
 
+  if (!defaultNodeData) return;
   return (
-    <div style={{ minHeight: `${processesLength * 200}px` }}>
+    <div
+      style={{
+        minHeight: `${((defaultNodeData.processes ?? []).length ?? 2) * 200}px`,
+      }}
+    >
       <input
         style={{ border: 0, width: "100%" }}
         value={formData.name}
@@ -118,16 +118,6 @@ const CustomNode = ({ data }: customNodeProps) => {
           );
         })}
       </select>
-      {/* <DropDown
-      openMenuOnClick={true}
-        onClick={(e) => {
-          e.stopPropagation();
-        }}
-        value={formData.inchargeId ? { label: "user", value: "user" } : null}
-        placeholder="Incharge"
-        options={[{ label: "user", value: "user" }]}
-        onChange={(e: any) => onChange("inchargeId", e.value)}
-      /> */}
     </div>
   );
 };

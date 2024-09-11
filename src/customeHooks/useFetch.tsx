@@ -32,7 +32,6 @@ const useFetch: UseFetch = (apiList, payloadData) => {
         try {
           const api = apiList[key];
           result[key] = (await api(...payload)).data;
-          console.log(result[key], "result");
         } catch (error) {
           console.error(error);
           result[key] = null;

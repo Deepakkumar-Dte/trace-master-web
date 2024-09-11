@@ -15,7 +15,6 @@ import {
   useReactFlow,
   Background,
   BackgroundVariant,
-  Node,
   Edge,
   Connection,
 } from "@xyflow/react";
@@ -23,54 +22,20 @@ import { v4 } from "uuid";
 import { CustomEdge, CustomNode, DraggaleNode } from "@/components/custom";
 import { useDrop } from "react-dnd";
 import { Button, Spinner } from "@/components/ui";
-import {
-  getProcessMappingNodes,
-  upsertProcessMappingData,
-  upsertTracking,
-} from "@/shared/api";
-import { useParams } from "next/navigation";
-import { customNodeProps, node as CustomNodeTypes } from "@/types";
+import { getProcessMappingNodes, upsertProcessMappingData } from "@/shared/api";
+import { useParams, useRouter } from "next/navigation";
+import { customNodeProps } from "@/types";
 import { NodeMappingContext } from "@/context/nodeMappingContext";
-
-const convertNodeDataIntoNodeMap = (data: CustomNodeTypes[]) => {
-  return data.reduce((acc, cur) => {
-    acc.set(cur.id, cur);
-    return acc;
-  }, new Map<string, any>());
-};
-
-const convertNodeDataIntoPayload = (nodes: customNodeProps[]) => {
-  return nodes.map((node) => {
-    const {
-      id,
-      position,
-      data: { defaultId, inchargeId, name, processId },
-    } = node;
-    return { id, defaultId, inchargeId, name, processId, ...position };
-  });
-};
-
-const convertEdgeDataIntoPayload = (edges: Edge[], processId: string) => {
-  return edges.map((edge) => {
-    const { target, source, sourceHandle, targetHandle, id } = edge;
-    return { target, source, sourceHandle, targetHandle, id, processId };
-  });
-};
-
-const convertMappingNodeDataIntoNode = (
-  nodes: CustomNodeTypes[]
-): customNodeProps[] => {
-  return nodes.map((node) => {
-    return {
-      id: node.id,
-      data: node,
-      type: "default",
-      position: { x: node.x ?? 0, y: node.y ?? 0 },
-    };
-  });
-};
+import {
+  convertEdgeDataIntoPayload,
+  convertMappingNodeDataIntoNode,
+  convertNodeDataIntoNodeMap,
+  convertNodeDataIntoPayload,
+} from "@/helpers";
 
 const NodeMapping = () => {
+  const navigate = useRouter();
+  const { addNodes } = useReactFlow();
   const { processId } = useParams();
   const { defaultNodeList, setDefaultNodeList, setUserOptions } =
     useContext(NodeMappingContext);
@@ -96,6 +61,7 @@ const NodeMapping = () => {
       setisLoading(false);
     }
   }, []);
+
   useEffect(() => {
     fetchData();
   }, [fetchData]);
@@ -103,8 +69,6 @@ const NodeMapping = () => {
   const handleRemove = (id: any) => {
     setNodes((pre: any) => pre.filter((e: any) => e.id !== id));
   };
-
-  const { addNodes } = useReactFlow();
 
   const drop = useDrop(() => ({
     accept: "NODE",
@@ -130,8 +94,11 @@ const NodeMapping = () => {
     try {
       const nodeData = convertNodeDataIntoPayload(nodes);
       const edgeData = convertEdgeDataIntoPayload(edges, processId as string);
-
-      upsertProcessMappingData({ nodes: nodeData, edges: edgeData, removedConnections: removedConnections.current });
+      upsertProcessMappingData({
+        nodes: nodeData,
+        edges: edgeData,
+        removedConnections: removedConnections.current,
+      });
     } catch (err) {
       console.log(err);
     }
@@ -162,10 +129,12 @@ const NodeMapping = () => {
         <>
           <div className="h-[60px] flex justify-between p-2">
             <div>
-              <Button>Back</Button>
+              <Button onClick={() => navigate.back()}>Back</Button>
             </div>
             <div className="flex gap-4">
-              <Button>Manage</Button>
+              <Button onClick={() => navigate.push("manage/node")}>
+                Manage
+              </Button>
               <Button onClick={handleSave}>Save</Button>
             </div>
           </div>
@@ -183,10 +152,10 @@ const NodeMapping = () => {
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
             nodeTypes={{ default: CustomNode as any }}
-            defaultViewport={{ zoom: 1, x: 100, y: 100 }}
+            defaultViewport={{ zoom: 0.7, x: 200, y: 200 }}
           >
             <Background
-              color="#ccc"
+              size={2.5}
               variant={BackgroundVariant.Dots}
               style={{ backgroundColor: "white" }}
             />

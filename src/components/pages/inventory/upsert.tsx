@@ -389,11 +389,7 @@ const CreateProductForm = () => {
         </div>
       </div>
       <Dialog open={modalData.open} onOpenChange={handleCloseModel}>
-        <DialogTrigger
-          onClick={() => {
-            console.log("CLicked");
-          }}
-        />
+        <DialogTrigger onClick={() => {}} />
         <DialogOverlay>
           <DialogContent>
             {modalData.type === "category" ? (

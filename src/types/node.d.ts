@@ -5,15 +5,16 @@ export type IODataType =
   | "text"
   | "number"
   | "dropdown"
-  | "component"
   | "file"
-  | "Date";
+  | "date"
+  | "object";
 
 export interface IOFormtype {
   id: string;
   label: string;
   variableName: string;
   dataType: IODataType;
+  required: boolean;
   recurring: boolean;
   lookupId?: string;
   lookupValueId?: string;

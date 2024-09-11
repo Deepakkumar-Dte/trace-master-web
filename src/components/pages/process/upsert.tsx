@@ -26,7 +26,6 @@ const Upsert = () => {
     try {
       e.preventDefault();
       const payload = processId ? { ...formData, id: processId } : formData;
-      console.log(payload);
       await upsertTracking(payload);
       handleCancel();
       toast({

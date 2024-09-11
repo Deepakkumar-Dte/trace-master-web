@@ -1,14 +1,12 @@
-import { FC, useContext } from "react";
-import { Ioform } from "@/components/custom";
+import { FC, memo, useContext } from "react";
 import { NodeProcessContext } from "@/context/processContext";
 import { Button, Input } from "@/components/ui";
+import FormCreator from "./ioFormCreator";
 
 const Process: FC<{ nodeId: string; index: number }> = ({
   index: processIndex,
 }) => {
-  const { processes, addIOForm, removeIOForm, handleChange } =
-    useContext(NodeProcessContext);
-
+  const { processes, addIOForm, handleChange } = useContext(NodeProcessContext);
   return (
     <>
       <div className="form-group">
@@ -27,41 +25,31 @@ const Process: FC<{ nodeId: string; index: number }> = ({
           }
         />
         <div
-          className=" p-4 mt-5 flex flex-col gap-5 overflow-x-scroll w-auto"
+          className=" p-4 mt-5 flex flex-col gap-2 w-auto"
           style={{
             border: "1px solid #CCCCCC",
           }}
         >
           <div className="font-[700] text-[16px] mb-3">Output Form*</div>
-          {processes[processIndex].outputs.map(
-            (output: any, ioIndex: number) => {
-              return (
-                <Ioform
-                  key={`${processIndex}:${ioIndex}`}
-                  handleBlur={() => {}}
-                  data={output}
-                  handleChange={(name, value) =>
-                    handleChange({
-                      name,
-                      value,
-                      processIndex,
-                      ioIndex,
-                      type: "outputs",
-                    })
-                  }
-                  handleRemove={() => {
-                    removeIOForm("outputs", processIndex, ioIndex);
-                  }}
-                  id={output.formId}
-                  index={ioIndex}
-                />
-              );
-            }
-          )}
+
+          {processes[processIndex].outputs.map((output, ioIndex) => {
+            return (
+              <FormCreator
+                key={output.id}
+                handleChange={handleChange}
+                data={output}
+                id={output.id}
+                processIndex={processIndex}
+                ioIndex={ioIndex}
+                type="outputs"
+                isChild={false}
+              />
+            );
+          })}
         </div>
         <Button
           style={{
-            padding: " 0.5rem 1rem",
+            padding: "0.5rem 1rem",
             margin: "1rem 0",
           }}
           onClick={() => {
@@ -72,7 +60,7 @@ const Process: FC<{ nodeId: string; index: number }> = ({
         </Button>
       </div>
       <div
-        className=" p-4 mt-5 flex flex-col gap-5 overflow-x-scroll w-auto"
+        className=" p-4 mt-5 flex flex-col gap-2 w-auto"
         style={{
           border: "1px solid #CCCCCC",
         }}
@@ -80,24 +68,15 @@ const Process: FC<{ nodeId: string; index: number }> = ({
         <div className="font-[700] text-[16px] mb-3">Input Form*</div>
         {processes[processIndex].inputs.map((input: any, ioIndex: number) => {
           return (
-            <Ioform
-              key={`${processIndex}:${ioIndex}`}
-              handleBlur={() => {}}
+            <FormCreator
+              key={input.id}
+              handleChange={handleChange}
               data={input}
-              handleChange={(name, value) =>
-                handleChange({
-                  name,
-                  value,
-                  processIndex,
-                  ioIndex,
-                  type: "inputs",
-                })
-              }
-              handleRemove={() => {
-                removeIOForm("inputs", processIndex, ioIndex);
-              }}
-              id={input.formId}
-              index={ioIndex}
+              id={input.id}
+              processIndex={processIndex}
+              ioIndex={ioIndex}
+              type="inputs"
+              isChild={false}
             />
           );
         })}
@@ -135,4 +114,4 @@ const Process: FC<{ nodeId: string; index: number }> = ({
   );
 };
 
-export default Process;
+export default memo(Process);

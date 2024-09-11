@@ -1,25 +1,21 @@
-'use client'
+"use client";
 import { FormikHandlers } from "formik";
-import { dataTypeOptions } from "../../../shared/config";
+import { dataTypeOptions as dtOpt } from "../../../shared/config";
 import { Input } from "@/components/ui";
 import DropDown from "@/components/ui/dropdown";
 import { Switch } from "@/components/ui/switch";
-import { memo } from "react";
+import { memo, useMemo } from "react";
+import { IoFormArgs } from "@/context/processContext";
 
 type props = {
   id: string;
   index: number;
-  data: {
-    label: string | null;
-    variableName: string | null;
-    dataType: string | null;
-    type: "input" | "output";
-    required: boolean;
-  };
+  data: IoFormArgs;
   handleBlur: FormikHandlers["handleBlur"];
   handleChange: (name: string, value: any) => void;
   handleRemove: (index: number, type: "inputs" | "outputs") => void;
   error?: any;
+  isChild?: boolean;
 };
 
 const IoFrom = ({
@@ -28,10 +24,18 @@ const IoFrom = ({
   handleBlur,
   handleChange,
   handleRemove,
+  isChild = false,
   error = {},
   index,
 }: props) => {
   const formType = data.type === "input" ? "inputs" : "outputs";
+  const dataTypeOptions = useMemo(() => {
+    return isChild
+      ? dtOpt.filter((e) => {
+          return  e.value !== "object";
+        })
+      : dtOpt;
+  }, [isChild]);
   return (
     <div key={id} className="flex justify-between items-center gap-x-8">
       <div className="w-full">

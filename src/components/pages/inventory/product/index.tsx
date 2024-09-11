@@ -61,7 +61,7 @@ const ProductOverLay = () => {
   );
 };
 
-const FilterAndNavigation = memo(({ type }: { type: pathNames }) => {
+const FilterAndNavigation = ({ type }: { type: pathNames }) => {
   const navigate = useRouter();
   const { productId } = useParams();
   return type === "overview" ? (
@@ -98,6 +98,6 @@ const FilterAndNavigation = memo(({ type }: { type: pathNames }) => {
       />
     </div>
   );
-});
+};
 
-export default ProductOverLay;
+export default memo(ProductOverLay);
