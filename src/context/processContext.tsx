@@ -1,9 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useFormik } from "formik";
 import { upsertDefaultNode } from "../shared/api";
-import { createContext, useCallback, useRef, useState } from "react";
+import React,{ createContext, useCallback, useRef, useState } from "react";
 import { schema } from "../shared/validation_schema/node";
 import { useParams, useRouter } from "next/navigation";
 import { v4 } from "uuid";
+import { useToast } from "@/components/ui/use-toast";
 
 type formType = "inputs" | "outputs";
 
@@ -98,6 +101,7 @@ const initProcessValues = {
 export const NodeProcessContext = createContext(initProcessValues);
 
 const NodeProcessContextProvider = ({ children }: any) => {
+  const { toast } = useToast();
   const [processes, setProcesses] = useState(initProcessValues.processes);
   const [formData, setformData] = useState(initProcessValues.formData);
   const [childIoForms, setChildIoForms] = useState<
@@ -274,29 +278,35 @@ const NodeProcessContextProvider = ({ children }: any) => {
       removedItems.current,
       processId
     );
-    // const error = await validateForm({ processes, ...formData });
-    // if (Object.keys(error).length) {
-    //   seterrors(error);
-    //   console.log(error);
-    //   return;
-    // }
-    // await upsertDefaultNode({
-    //   ...formData,
-    //   processes,
-    //   processId,
-    //   removedItems: removedItems.current,
-    // });
-    // alert("Node Added Successfully");
-    // setformData(initProcessValues.formData);
-    // setProcesses(initProcessValues.processes);
-    // navigate.back();
+    const error = await validateForm({ processes, ...formData });
+    if (Object.keys(error).length) {
+      seterrors(error);
+      toast({
+        title: "Error",
+        variant: "destructive",
+        description: "Please Ensure All the Mandatory fields are entered",
+      });
+      return;
+    }
+    await upsertDefaultNode({
+      ...formData,
+      processes,
+      processId,
+      childIoForms,
+      removedItems: removedItems.current,
+    });
+    toast({ title: "Success", description: "Node Data Updated Successfully" });
+    setformData(initProcessValues.formData);
+    setProcesses(initProcessValues.processes);
+    navigate.back();
   }, [processes, formData, childIoForms]);
 
   // initialize with existing data
   const setData = (data: any) => {
     if (Object.keys(data).length) {
-      const { processes = [], ...rest } = data;
+      const { processes = [], childIoForms = {}, ...rest } = data;
       setformData(rest);
+      setChildIoForms(childIoForms);
       setProcesses(processes);
     } else {
       setformData(initProcessValues.formData);

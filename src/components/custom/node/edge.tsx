@@ -1,5 +1,6 @@
-'use client'
-import { BaseEdge, getStraightPath } from "@xyflow/react";
+"use client";
+import React from "react";
+import { BaseEdge, getBezierPath } from "@xyflow/react";
 
 export default function CustomEdge({
   id,
@@ -7,8 +8,8 @@ export default function CustomEdge({
   sourceY,
   targetX,
   targetY,
-}: any) {
-  const [edgePath] = getStraightPath({
+}: Record<string, number>) {
+  const [edgePath] = getBezierPath({
     sourceX,
     sourceY,
     targetX,
@@ -17,7 +18,7 @@ export default function CustomEdge({
 
   return (
     <>
-      <BaseEdge id={id} path={edgePath} />
+      <BaseEdge id={String(id)} path={edgePath} />
     </>
   );
 }

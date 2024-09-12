@@ -1,5 +1,5 @@
 "use client";
-import {
+import React,{
   memo,
   useCallback,
   useContext,
@@ -42,6 +42,7 @@ const Upsert = () => {
   useEffect(() => {
     if (nodeId) fetchNodeData();
     else {
+      setData({})
       setIsLoading(false);
     }
   }, []);

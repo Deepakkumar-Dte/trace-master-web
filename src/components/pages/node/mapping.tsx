@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import "@xyflow/react/dist/style.css";
 import React, {
@@ -31,9 +32,12 @@ import {
   convertMappingNodeDataIntoNode,
   convertNodeDataIntoNodeMap,
   convertNodeDataIntoPayload,
+  validateNodeConnection,
 } from "@/helpers";
+import { useToast } from "@/components/ui/use-toast";
 
 const NodeMapping = () => {
+  const { toast } = useToast();
   const navigate = useRouter();
   const { addNodes } = useReactFlow();
   const { processId } = useParams();
@@ -85,9 +89,47 @@ const NodeMapping = () => {
 
   const onConnect = useCallback(
     (params: Connection) => {
-      setEdges((eds) => addEdge({ ...params, id: v4() }, eds));
+      const { source, target, sourceHandle, targetHandle } = params;
+      const sourceDefaultKey =
+        nodes.find((e) => e.id === source)?.data.defaultId ?? "";
+      const targetDefaultKey =
+        nodes.find((e) => e.id === target)?.data.defaultId ?? "";
+      const sourceNode = defaultNodeList.get(sourceDefaultKey);
+      const targetNode = defaultNodeList.get(targetDefaultKey);
+      const sourceProcessId = (sourceHandle ?? "").split(":")[0];
+      const targetProcessId = (targetHandle ?? "").split(":")[0];
+      if (
+        sourceNode !== undefined &&
+        targetNode !== undefined &&
+        sourceProcessId &&
+        targetProcessId
+      ) {
+        const sourceFormData =
+          sourceNode.processes.find((e) => e.id === sourceProcessId)?.outputs ??
+          [];
+        const targetFormData =
+          targetNode.processes.find((e) => e.id === targetProcessId)?.inputs ??
+          [];
+        if (
+          validateNodeConnection(
+            sourceFormData,
+            targetFormData,
+            sourceNode.childIoForms,
+            targetNode.childIoForms
+          )
+        ) {
+          setEdges((eds) => addEdge({ ...params, id: v4() }, eds));
+        } else {
+          toast({
+            title: "Error",
+            variant: "destructive",
+            description:
+              "Please Ensure the SourceNode Outputs and Target Node Inputs form details are same",
+          });
+        }
+      }
     },
-    [setEdges]
+    [setEdges, nodes]
   );
 
   const handleSave = async () => {
@@ -161,12 +203,10 @@ const NodeMapping = () => {
             />
           </ReactFlow>
           <div className="absolute bottom-0 h-[100px] flex p-2 gap-2">
-            {Array.from(
-              defaultNodeList.values(),
-              ({ id, processes, ...rest }) => (
-                <DraggaleNode data={rest} id={id} key={id} />
-              )
-            )}
+            {Array.from(defaultNodeList.values(), ({ id, ...rest }) => {
+              rest.processes = [];
+              return <DraggaleNode data={rest} id={id} key={id} />;
+            })}
           </div>
         </>
       ) : (

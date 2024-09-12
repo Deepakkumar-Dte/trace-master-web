@@ -1,7 +1,7 @@
 "use client";
 import { Handle, HandleProps, Position } from "@xyflow/react";
 import type { customNodeProps, IOFormtype, IoKeyType } from "../../../types";
-import { memo, useMemo, useCallback, useState, useEffect } from "react";
+import React, { memo, useCallback, useState, useEffect } from "react";
 import { HoverCard, HoverCardTrigger, HoverCardContent } from "@/components/ui";
 import { useContext } from "react";
 import { NodeMappingContext } from "@/context/nodeMappingContext";
@@ -40,13 +40,14 @@ const CustomNode = ({ data }: customNodeProps) => {
       process: { name: string; index: number; id: string },
       type: IoKeyType
     ) => {
+      if (!data.length) return null;
       const partial = 100 / data.length;
       const top = partial / 2 + process.index * partial;
       return (
-        <HoverCard key={`${process.id}-${type}`}>
+        <HoverCard key={`${process.id}:${type}`}>
           <HoverCardTrigger asChild>
             <Handle
-              id={`${process.id}-${type}`}
+              id={`${process.id}:${type}`}
               style={{
                 top: `${top}%`,
                 right: "-1%",

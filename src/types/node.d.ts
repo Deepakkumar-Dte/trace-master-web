@@ -37,6 +37,7 @@ export type node = {
   processId: string;
   x?: number;
   y?: number;
+  childIoForms?: Record<string,IOFormtype[]>
 };
 
 export type customNodeProps = Node & {
