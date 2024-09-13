@@ -1,4 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
+import React from "react";
 import { FormikHandlers } from "formik";
 import { dataTypeOptions as dtOpt } from "../../../shared/config";
 import { Input } from "@/components/ui";
@@ -25,7 +27,6 @@ const IoFrom = ({
   handleChange,
   handleRemove,
   isChild = false,
-  error = {},
   index,
 }: props) => {
   const formType = data.type === "input" ? "inputs" : "outputs";
@@ -81,7 +82,6 @@ const IoFrom = ({
           label="Data Type"
           placeholder={"Select Here"}
           onChange={(e: any) => {
-            console.log(e);
             handleChange(`dataType`, e.value);
           }}
         />
@@ -89,7 +89,7 @@ const IoFrom = ({
       <div className="flex flex-col items-center gap-3 mt-6">
         <label>Required</label>
         <Switch
-          onClick={(e) => {
+          onClick={() => {
             handleChange("required", !data.required);
           }}
         />

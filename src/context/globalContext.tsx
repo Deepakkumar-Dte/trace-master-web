@@ -1,16 +1,15 @@
 import { Spinner } from "@/components/ui";
 import { getLookupList } from "@/shared/api";
-import {
+import React,{
   createContext,
   Dispatch,
   PropsWithChildren,
   SetStateAction,
-  useCallback,
   useEffect,
   useState,
 } from "react";
 
-type ListType = { label: string; value: string }[] | [];
+export type ListType = { label: string; value: string }[] | [];
 
 interface TInitValue {
   categoryList: ListType;

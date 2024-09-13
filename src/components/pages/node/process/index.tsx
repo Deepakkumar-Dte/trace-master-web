@@ -1,4 +1,4 @@
-import { FC, memo, useContext } from "react";
+import React,{ FC, memo, useContext } from "react";
 import { NodeProcessContext } from "@/context/processContext";
 import { Button, Input } from "@/components/ui";
 import FormCreator from "./ioFormCreator";
@@ -66,7 +66,7 @@ const Process: FC<{ nodeId: string; index: number }> = ({
         }}
       >
         <div className="font-[700] text-[16px] mb-3">Input Form*</div>
-        {processes[processIndex].inputs.map((input: any, ioIndex: number) => {
+        {processes[processIndex].inputs.map((input, ioIndex) => {
           return (
             <FormCreator
               key={input.id}

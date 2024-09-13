@@ -1,4 +1,6 @@
-import { AccordionCollapse } from "@/assets/icons";
+/* eslint-disable @typescript-eslint/no-unused-expressions */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { AccordionCollapse, AccordionExpand } from "@/assets/icons";
 import { Ioform } from "@/components/custom";
 import IoDropDownType from "@/components/custom/node/IoDropDownType";
 import { Button } from "@/components/ui";
@@ -10,7 +12,7 @@ import {
   AccordionTrigger,
   AccordionContent,
 } from "@radix-ui/react-accordion";
-import { memo, useContext } from "react";
+import React, { memo, useContext, useState } from "react";
 
 interface FormCreator {
   processIndex: number;
@@ -38,6 +40,7 @@ const FormCreator = ({
     removeChildForm,
     removeIOForm,
   } = useContext(NodeProcessContext);
+  const [isOpen, setIsOpen] = useState(String(ioIndex));
 
   if (!childIoForms[data.id] && data.dataType !== "dropdown")
     return (
@@ -46,15 +49,15 @@ const FormCreator = ({
         handleBlur={() => {}}
         data={data}
         isChild={isChild}
-        handleChange={(name, value) =>
+        handleChange={(name, value) => {
           handleChange({
             name,
             value,
             processIndex,
             ioIndex,
             type,
-          })
-        }
+          });
+        }}
         handleRemove={() => {
           isChild
             ? removeChildForm(id, ioIndex)
@@ -65,7 +68,13 @@ const FormCreator = ({
       />
     );
   return (
-    <Accordion key={Symbol(processIndex).toString()} type="single" collapsible>
+    <Accordion
+      key={Symbol(processIndex).toString()}
+      onValueChange={(val) => setIsOpen(val)}
+      type="single"
+      collapsible
+      value={isOpen}
+    >
       <AccordionItem
         value={ioIndex.toString()}
         className="bg-[#F2F4F5] p-4 rounded"
@@ -93,8 +102,8 @@ const FormCreator = ({
             id={data.id ?? ""}
             index={ioIndex}
           />
-          <AccordionTrigger className="absolute left-[-30px] top-[50%]">
-            <AccordionCollapse />
+          <AccordionTrigger className="absolute left-[-30px] top-[45%]">
+            {isOpen ? <AccordionExpand /> : <AccordionCollapse />}
           </AccordionTrigger>
         </AccordionHeader>
         <AccordionContent>
@@ -126,15 +135,15 @@ const FormCreator = ({
             </>
           ) : (
             <IoDropDownType
-              handleChange={(name: string, value: string) =>
+              handleChange={(name: string, value: string) => {
                 handleChange({
                   name,
                   value,
                   processIndex,
                   ioIndex,
-                  type: "outputs",
-                })
-              }
+                  type,
+                });
+              }}
               data={data}
             />
           )}
